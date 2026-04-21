@@ -1,12 +1,13 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { dummyProducts, categories } from '@/lib/dummy-data';
 import { ProductCard } from '@/components/product-card';
 import { Search, Sliders } from 'lucide-react';
 
-export default function Products() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const initialCategory = searchParams.get('category') || 'All';
 
@@ -19,12 +20,10 @@ export default function Products() {
   const filteredProducts = useMemo(() => {
     let products = dummyProducts;
 
-    // Filter by category
     if (selectedCategory !== 'All') {
       products = products.filter((p) => p.category === selectedCategory);
     }
 
-    // Filter by search query
     if (searchQuery) {
       products = products.filter((p) =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -32,12 +31,10 @@ export default function Products() {
       );
     }
 
-    // Filter by price range
     products = products.filter(
       (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
     );
 
-    // Sort
     const sorted = [...products];
     if (sortBy === 'price-low') {
       sorted.sort((a, b) => a.price - b.price);
@@ -76,10 +73,7 @@ export default function Products() {
                   Search Products
                 </label>
                 <div className="relative">
-                  <Search
-                    size={20}
-                    className="absolute left-3 top-3 text-gray-400"
-                  />
+                  <Search size={20} className="absolute left-3 top-3 text-gray-400" />
                   <input
                     type="text"
                     value={searchQuery}
@@ -171,14 +165,12 @@ export default function Products() {
 
           {/* Products Grid */}
           <div className="lg:col-span-3">
-            {/* Results Info */}
             <div className="mb-6">
               <p className="text-gray-600">
                 Showing {filteredProducts.length} of {dummyProducts.length} products
               </p>
             </div>
 
-            {/* Products */}
             {filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredProducts.map((product) => (
@@ -207,5 +199,13 @@ export default function Products() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading products...</div>}>
+      <ProductsContent />
+    </Suspense>
   );
 }
