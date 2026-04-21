@@ -6,7 +6,7 @@ export default function ProductLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
       {children}
     </Suspense>
   );
